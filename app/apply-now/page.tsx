@@ -1,952 +1,882 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useState } from "react";
+import { createClient } from "@supabase/supabase-js";
 import {
-  ShieldCheck,
-  PiggyBank,
-  TrendingUp,
-  Globe2,
-  Home as HomeIcon,
-  Briefcase,
-  GraduationCap,
-  Coins,
-  Car,
-  Rocket,
-  Handshake,
-  Tag,
-  Headphones,
-  Mail,
-  MapPin,
-  Phone,
-  Twitter,
-  Facebook,
-  Linkedin,
-  Instagram,
-  ChevronDown,
-  Menu,
-  X,
-  ArrowRight,
-  Star,
   User,
-  BarChart3,
-  Calculator,
-  Users,
+  FileText,
+  Home,
+  CircleDollarSign,
+  Landmark,
+  ArrowRight,
+  ArrowLeft,
+  Check,
+  ShieldCheck,
+  Clock,
+  Sliders,
+  CheckCircle2,
 } from "lucide-react";
 
-/* ------------------------------------------------------------------ */
-/*  Content — edit these arrays to change what the page displays       */
-/* ------------------------------------------------------------------ */
+// Initialize Supabase Client (Ensure these variables exist in your .env.local file)
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
-const NAV_LINKS = [
-  { label: "Home", href: "#home" },
-  { label: "About", href: "#about" },
-  { label: "Loans", href: "#loans" },
-  { label: "FAQ", href: "#faq" },
-  { label: "Contact", href: "#contact" },
-];
-
-const LOAN_OPTIONS = [
-  {
-    icon: PiggyBank,
-    title: "Personal Loan",
-    rate: "10.49% onwards",
-    desc: "Quick access to funds for your personal needs with minimal documentation.",
-  },
-  {
-    icon: HomeIcon,
-    title: "Home Loan",
-    rate: "8.75% onwards",
-    desc: "Turn your dream of owning a home into reality with our flexible home loan options.",
-  },
-  {
-    icon: Briefcase,
-    title: "Business Loan",
-    rate: "11.25% onwards",
-    desc: "Power your business growth with tailored financing built for entrepreneurs.",
-  },
-  {
-    icon: GraduationCap,
-    title: "Education Loan",
-    rate: "8.75% onwards",
-    desc: "Make education affordable with our easy and flexible student loan plans.",
-  },
-  {
-    icon: Coins,
-    title: "Gold Loan",
-    rate: "10.25% onwards",
-    desc: "Unlock your gold's potential — get a quick loan to achieve your goals today.",
-  },
-  {
-    icon: Car,
-    title: "Car Loan",
-    rate: "10.49% onwards",
-    desc: "Drive your dream car home with our low-interest car loan options.",
-  },
-];
-
-const FEATURES = [
-  {
-    icon: ShieldCheck,
-    title: "100% Transparent Process",
-    desc: "Clear documentation and upfront information about all terms and conditions.",
-  },
-  {
-    icon: Rocket,
-    title: "Fast Approvals",
-    desc: "Get your loan approved within 24 hours through our streamlined process.",
-  },
-  {
-    icon: Handshake,
-    title: "Trusted Lenders",
-    desc: "Partner with India's top banks and NBFCs for secure lending.",
-  },
-  {
-    icon: Tag,
-    title: "No Hidden Fees",
-    desc: "All charges clearly disclosed upfront with no surprise costs.",
-  },
-  {
-    icon: Headphones,
-    title: "24/7 Customer Support",
-    desc: "Round-the-clock assistance for all your loan-related queries.",
-  },
-];
-
-const CHARGES = [
-  {
-    title: "Interest Rate",
-    desc: "Starting interest rate varies based on credit history, financial obligations, and lender discretion.",
-  },
-  {
-    title: "Eligibility",
-    desc: "Loan approval is subject to successful KYC and income verification.",
-  },
-  {
-    title: "APR & Repayment Schedule",
-    desc: "Min APR – 5.99%, Max APR – 18%. Repayment tenure: 6 to 120 months. T&C apply.",
-  },
-  {
-    title: "Processing / Facilitation Fee",
-    desc: "Ranges from 2% to 5% of the approved loan.",
-  },
-  {
-    title: "Foreclosure Policy",
-    desc: "No part payments. Full payment allowed only after paying at least 3 EMIs.",
-  },
-  {
-    title: "Overdue EMI Charges",
-    desc: "2% per month on outstanding amount.",
-  },
-  {
-    title: "Cheque Bounce",
-    desc: "₹500 per bounce.",
-  },
-  {
-    title: "Loan Cancellation",
-    desc: "No extra charges. Interest between disbursement and cancellation is payable. Processing fees are non-refundable.",
-  },
-  {
-    title: "Example",
-    desc: "Loan of ₹1L at 8% p.a. for 24 months = EMI of ₹4,523.",
-  },
-];
-
-const FAQS = [
-  {
-    q: "What documents do I need to apply for a loan?",
-    a: "You'll typically need a valid ID proof, address proof, income proof (salary slips or ITR), and bank statements from the last three months. Specific document lists vary by loan type.",
-  },
-  {
-    q: "How long does the loan approval process take?",
-    a: "Most applications are reviewed within 24 hours of submitting complete documentation. Disbursal timelines depend on the lender and loan type.",
-  },
-  {
-    q: "What is the minimum credit score required for loan approval?",
-    a: "A CIBIL score of 700 or above generally improves your chances, though eligibility also depends on income, existing obligations, and the lending partner's policy.",
-  },
-  {
-    q: "Can I repay my loan before the tenure ends?",
-    a: "Foreclosure is allowed only after at least 3 EMIs have been paid, and part payments are not permitted. See our charges section for details.",
-  },
-  {
-    q: "How are interest rates determined for my loan?",
-    a: "Rates are set based on your credit profile, income stability, loan amount, tenure, and the specific lending partner's risk assessment.",
-  },
-  {
-    q: "Is there a processing fee for loan applications?",
-    a: "Yes, a facilitation fee of 2% to 5% of the approved loan amount applies and is non-refundable, even if the loan is later cancelled.",
-  },
-];
-
-/* ------------------------------------------------------------------ */
-/*  Small helpers                                                      */
-/* ------------------------------------------------------------------ */
-
-function formatINR(value: number) {
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    maximumFractionDigits: 0,
-  }).format(value);
+// Define form structure types
+interface FormData {
+  id?: string;
+  mobile: string;
+  // Step 1: Personal Info
+  fullName: string;
+  email: string;
+  // Step 2: Documents
+  aadharNumber: string;
+  panNumber: string;
+  // Step 3: Address
+  address: string;
+  pinCode: string;
+  state: string;
+  city: string;
+  // Step 4: Loan Details
+  loanAmount: string;
+  loanPurpose: string;
+  loanTenure: string;
+  emi: string;
+  interestRate: string;
+  // Step 5: Bank Details
+  accountHolderName: string;
+  ifscCode: string;
+  accountNumber: string;
+  accountType: string;
+  bankName: string;
+  branch: string;
 }
 
-function Slider({
-  label,
-  value,
-  min,
-  max,
-  step,
-  suffix,
-  onChange,
-}: {
-  label: string;
-  value: number;
-  min: number;
-  max: number;
-  step: number;
-  suffix: string;
-  onChange: (v: number) => void;
-}) {
-  return (
-    <div>
-      <div className="flex items-baseline justify-between text-xs sm:text-sm">
-        <span className="text-muted">{label}</span>
-        <span className="font-semibold text-ink">
-          {suffix === "₹" ? formatINR(value) : `${value}${suffix}`}
-        </span>
-      </div>
-      <input
-        type="range"
-        min={min}
-        max={max}
-        step={step}
-        value={value}
-        onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-3 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-brand/15 accent-[#4F3FF0]"
-      />
-    </div>
-  );
-}
+export default function ApplyPage() {
+  const [currentStep, setCurrentStep] = useState<number>(0); // 0 = Mobile Step, 1-5 = Form Steps
+  const [loading, setLoading] = useState<boolean>(false);
+  const [agreed, setAgreed] = useState<boolean>(true);
+  const [applicationId, setApplicationId] = useState<string | null>(null);
 
-function FaqItem({
-  q,
-  a,
-  open,
-  onToggle,
-}: {
-  q: string;
-  a: string;
-  open: boolean;
-  onToggle: () => void;
-}) {
-  return (
-    <div
-      className={`rounded-2xl border bg-white transition-colors ${
-        open ? "border-brand/30" : "border-black/5"
-      }`}
-    >
-      <button
-        onClick={onToggle}
-        className="flex w-full items-center gap-4 px-5 py-4 text-left sm:px-6"
-      >
-        <Star
-          className={`h-4 w-4 shrink-0 ${open ? "fill-brand text-brand" : "text-brand/40"}`}
-        />
-        <span className="flex-1 text-sm font-semibold text-ink sm:text-base">
-          {q}
-        </span>
-        <ChevronDown
-          className={`h-5 w-5 shrink-0 text-brand transition-transform duration-300 ${
-            open ? "rotate-180" : ""
-          }`}
-        />
-      </button>
-      <div
-        className={`grid transition-all duration-300 ease-out ${
-          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
-        }`}
-      >
-        <div className="overflow-hidden">
-          <p className="px-5 pb-5 pl-14 text-sm leading-relaxed text-muted sm:px-6 sm:pb-6 sm:pl-16">
-            {a}
-          </p>
-        </div>
-      </div>
-    </div>
-  );
-}
+  const [formData, setFormData] = useState<FormData>({
+    mobile: "",
+    fullName: "",
+    email: "",
+    aadharNumber: "",
+    panNumber: "",
+    address: "",
+    pinCode: "",
+    state: "",
+    city: "",
+    loanAmount: "80000",
+    loanPurpose: "Personal Loan",
+    loanTenure: "24 months",
+    emi: "3654.78",
+    interestRate: "7714.71",
+    accountHolderName: "",
+    ifscCode: "",
+    accountNumber: "",
+    accountType: "Savings",
+    bankName: "",
+    branch: "",
+  });
 
-/* ------------------------------------------------------------------ */
-/*  Page                                                                */
-/* ------------------------------------------------------------------ */
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
 
-export default function Home() {
-  const [menuOpen, setMenuOpen] = useState(false);
-  const [phone, setPhone] = useState("");
-  const [agree, setAgree] = useState(true);
-  const [openFaq, setOpenFaq] = useState<number | null>(0);
+  // Step 0: Save mobile number to Supabase first and obtain application ID
+  const handleMobileSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!formData.mobile || formData.mobile.length < 10) {
+      alert("Please enter a valid 10-digit mobile number");
+      return;
+    }
 
-  const [amount, setAmount] = useState(2500000);
-  const [tenure, setTenure] = useState(31);
-  const [rate, setRate] = useState(12.4);
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("loan_applications")
+        .insert([{ mobile: formData.mobile, current_step: 1 }])
+        .select()
+        .single();
 
-  const { emi, interest, total } = useMemo(() => {
-    const r = rate / 12 / 100;
-    const n = tenure;
-    const monthly =
-      r === 0 ? amount / n : (amount * r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
-    const totalPayable = monthly * n;
-    return {
-      emi: Math.round(monthly),
-      interest: Math.round(totalPayable - amount),
-      total: Math.round(totalPayable),
-    };
-  }, [amount, tenure, rate]);
+      if (error) throw error;
 
-  const principalShare = amount / total;
-  const circumference = 2 * Math.PI * 70;
-  const principalDash = circumference * principalShare;
+      if (data) {
+        setApplicationId(data.id);
+        setCurrentStep(1);
+      }
+    } catch (err: any) {
+      console.error("Error saving mobile number:", err.message);
+      // Fallback transition for frontend display/testing if Supabase isn't connected yet
+      setCurrentStep(1);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Steps 1 to 5: Update record dynamically on step change
+  const handleStepSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      if (applicationId) {
+        await supabase
+          .from("loan_applications")
+          .update({
+            ...formData,
+            current_step: currentStep + 1,
+          })
+          .eq("id", applicationId);
+      }
+
+      if (currentStep < 5) {
+        setCurrentStep((prev) => prev + 1);
+      } else {
+        alert("Application submitted successfully!");
+      }
+    } catch (err: any) {
+      console.error("Error updating application:", err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const stepsList = [
+    { id: 1, label: "Personal Info", icon: User },
+    { id: 2, label: "Document", icon: FileText },
+    { id: 3, label: "Address", icon: Home },
+    { id: 4, label: "Loan", icon: CircleDollarSign },
+    { id: 5, label: "Bank", icon: Landmark },
+  ];
 
   return (
-    <main className="bg-white font-sans text-ink antialiased">
-      {/* ---------------------------------------------------------- */}
-      {/* Header                                                     */}
-      {/* ---------------------------------------------------------- */}
-      <header className="sticky top-0 z-50 border-b border-black/5 bg-white/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6">
-          <a href="#home" className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand font-extrabold text-white">
-              U
-            </span>
-            <span className="text-base font-bold tracking-tight text-ink sm:text-lg">
-              Utkarsh Capital
-            </span>
-          </a>
-
-          <nav className="hidden items-center gap-8 md:flex">
-            {NAV_LINKS.map((link) => (
-              <a
-                key={link.label}
-                href={link.href}
-                className="text-sm font-medium text-ink/70 transition-colors hover:text-brand"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
-
-          <div className="hidden items-center gap-2 md:flex">
-            <a
-              href="#contact"
-              className="flex items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-medium text-ink/70 transition-colors hover:border-brand hover:text-brand"
-            >
-              <User className="h-4 w-4" /> Login
-            </a>
+    <div className="min-h-screen bg-[#f4f6fb] font-sans text-slate-800 flex flex-col">
+      {/* Top Header */}
+      <header className="w-full bg-white border-b border-slate-200 py-4 px-6 md:px-12 flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center center text-white font-bold text-lg justify-center">
+            U
           </div>
-
-          <button
-            className="text-ink md:hidden"
-            onClick={() => setMenuOpen((v) => !v)}
-            aria-label="Toggle menu"
-          >
-            {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          <span className="font-bold text-lg text-slate-900 tracking-tight">
+            Utkarsh Capital
+          </span>
+        </div>
+        <nav className="hidden md:flex gap-8 text-sm font-medium text-slate-600">
+          <a href="#" className="hover:text-indigo-600 transition">HOME</a>
+          <a href="#" className="hover:text-indigo-600 transition">ABOUT</a>
+          <a href="#" className="hover:text-indigo-600 transition">LOANS</a>
+          <a href="#" className="hover:text-indigo-600 transition">FAQ</a>
+          <a href="#" className="hover:text-indigo-600 transition">CONTACT</a>
+        </nav>
+        <div className="flex items-center gap-4">
+          <button className="text-xs md:text-sm font-semibold text-slate-700 hover:text-indigo-600">
+            Check Status
+          </button>
+          <button className="bg-indigo-600 text-white px-5 py-2 rounded-full text-xs md:text-sm font-semibold shadow-md hover:bg-indigo-700 transition">
+            Apply Now
           </button>
         </div>
-
-        {menuOpen && (
-          <div className="border-t border-black/5 bg-white px-4 pb-5 sm:px-6 md:hidden">
-            <nav className="flex flex-col gap-1 pt-3">
-              {NAV_LINKS.map((link) => (
-                <a
-                  key={link.label}
-                  href={link.href}
-                  onClick={() => setMenuOpen(false)}
-                  className="rounded-lg px-2 py-2.5 text-sm font-medium text-ink/80 hover:bg-brand/5"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </nav>
-          </div>
-        )}
       </header>
 
-      {/* ---------------------------------------------------------- */}
-      {/* Hero                                                        */}
-      {/* ---------------------------------------------------------- */}
-      <section
-        id="home"
-        className="relative overflow-hidden bg-gradient-to-br from-brand-deep via-[#2E2494] to-brand"
-      >
-        {/* decorative glow + floating icon chips, not a stock photo */}
-        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl sm:h-96 sm:w-96" />
-        <div className="pointer-events-none absolute right-6 top-24 hidden flex-col gap-4 sm:right-10 md:flex">
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur">
-            <Calculator className="h-6 w-6 text-white/80" strokeWidth={1.5} />
-          </div>
-          <div className="ml-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur">
-            <BarChart3 className="h-6 w-6 text-white/80" strokeWidth={1.5} />
-          </div>
-          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur">
-            <TrendingUp className="h-6 w-6 text-white/80" strokeWidth={1.5} />
-          </div>
-        </div>
-
-        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 md:py-28">
-          <div className="max-w-2xl text-center sm:text-left">
-            <h1 className="text-[2.25rem] font-extrabold leading-[1.15] text-white sm:text-5xl md:text-[3.4rem]">
-              Unlock Your Financial Freedom
-            </h1>
-            <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-white/75 sm:mx-0 sm:text-base">
-              Simple, secure, and smart personal loans. Tailored for your
-              journey — with flexible EMIs and trusted support.
-            </p>
-
-            <form
-              onSubmit={(e) => e.preventDefault()}
-              className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:mx-0 sm:flex-row"
-            >
-              <div className="flex flex-1 items-center gap-2 rounded-full bg-white px-4 py-3.5 shadow-lg shadow-black/10">
-                <Phone className="h-4 w-4 text-brand/60" />
-                <span className="text-sm text-ink/50">+91</span>
-                <input
-                  type="tel"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  placeholder="Enter mobile number"
-                  className="w-full bg-transparent text-sm text-ink placeholder:text-ink/40 focus:outline-none"
-                />
-              </div>
-              <button
-                type="submit"
-                className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-black"
-              >
-                Apply Now <ArrowRight className="h-4 w-4" />
-              </button>
-            </form>
-
-            <label className="mx-auto mt-4 flex w-fit items-center gap-2 text-xs text-white/60 sm:mx-0">
-              <input
-                type="checkbox"
-                checked={agree}
-                onChange={(e) => setAgree(e.target.checked)}
-                className="h-3.5 w-3.5 accent-white"
-              />
-              I agree to the{" "}
-              <a href="#" className="underline underline-offset-2">
-                Terms
-              </a>{" "}
-              and{" "}
-              <a href="#" className="underline underline-offset-2">
-                Privacy Policy
-              </a>
-            </label>
-
-            <div className="mx-auto mt-10 flex max-w-md flex-wrap justify-center gap-x-8 gap-y-3 border-t border-white/15 pt-6 text-xs text-white/70 sm:mx-0 sm:justify-start">
-              <span className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-white" /> Trusted
-              </span>
-              <span className="flex items-center gap-2">
-                <PiggyBank className="h-4 w-4 text-white" /> Savings
-              </span>
-              <span className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-white" /> Growth
-              </span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------- */}
-      {/* Who we are                                                  */}
-      {/* ---------------------------------------------------------- */}
-      <section id="about" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
-        <div className="grid gap-10 md:grid-cols-2 md:items-center md:gap-14">
-          <div className="relative order-2 md:order-1">
-            <div className="flex aspect-[4/3] items-center justify-center rounded-3xl bg-brand-light">
-              <div className="grid grid-cols-2 gap-5">
-                <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-md shadow-brand/10 sm:h-24 sm:w-24">
-                  <Globe2 className="h-10 w-10 text-brand" strokeWidth={1.5} />
-                </div>
-                <div className="mt-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-md shadow-brand/10 sm:h-24 sm:w-24">
-                  <BarChart3 className="h-10 w-10 text-brand" strokeWidth={1.5} />
-                </div>
-                <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-md shadow-brand/10 sm:h-24 sm:w-24">
-                  <Calculator className="h-10 w-10 text-brand" strokeWidth={1.5} />
-                </div>
-                <div className="mt-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-md shadow-brand/10 sm:h-24 sm:w-24">
-                  <TrendingUp className="h-10 w-10 text-brand" strokeWidth={1.5} />
-                </div>
-              </div>
-            </div>
-            <div className="absolute -bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-2xl border border-black/5 bg-white px-5 py-4 shadow-xl shadow-brand/10 sm:left-6 sm:translate-x-0">
-              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand/10">
-                <ShieldCheck className="h-5 w-5 text-brand" />
-              </span>
-              <div className="text-sm">
-                <p className="font-semibold text-ink">Finance with Trust</p>
-                <p className="text-xs text-muted">RBI-recognized NBFC partner</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="order-1 text-center md:order-2 md:text-left">
-            <span className="inline-block rounded-full bg-brand-light px-4 py-1.5 text-xs font-semibold text-brand">
-              Who We Are
+      {/* Main Container */}
+      <main className="max-w-6xl w-full mx-auto px-4 py-8 flex-grow">
+        {/* Banner Headers */}
+        {currentStep === 0 ? (
+          <div className="text-center mb-8">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+              START AN APPLICATION
             </span>
-            <h2 className="mt-4 text-2xl font-extrabold leading-tight text-ink sm:text-3xl md:text-4xl">
-              Simple, Secure &amp; Built for Growth
-            </h2>
-            <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-muted sm:text-base md:mx-0">
-              We&apos;re not just another credit platform. We&apos;re your
-              growth partner — helping you save smarter, borrow with
-              confidence, and build wealth step by step.
-            </p>
-
-            <div className="mt-7 flex flex-wrap justify-center gap-6 text-sm md:justify-start">
-              <span className="flex items-center gap-2 font-medium text-ink/80">
-                <ShieldCheck className="h-4 w-4 text-brand" /> Trusted
-              </span>
-              <span className="flex items-center gap-2 font-medium text-ink/80">
-                <PiggyBank className="h-4 w-4 text-brand" /> Smart
-              </span>
-              <span className="flex items-center gap-2 font-medium text-ink/80">
-                <TrendingUp className="h-4 w-4 text-brand" /> Growth
-              </span>
-            </div>
-
-            <a
-              href="#about"
-              className="mt-8 inline-flex items-center gap-2 rounded-full border-2 border-brand px-6 py-3 text-sm font-semibold text-brand transition-colors hover:bg-brand hover:text-white"
-            >
-              Explore Our Story <ArrowRight className="h-4 w-4" />
-            </a>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------- */}
-      {/* Loan options                                                */}
-      {/* ---------------------------------------------------------- */}
-      <section id="loans" className="bg-[#FAFAFE] py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6">
-          <div className="mx-auto max-w-2xl text-center">
-            <h2 className="text-2xl font-extrabold text-ink sm:text-3xl md:text-4xl">
-              Explore Our Loan Options
-            </h2>
-            <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
-              <span className="font-semibold text-brand">Utkarsh Capital</span>{" "}
-              strictly practices robust, responsible lending. From personal
-              needs to big dreams — choose the right loan with flexible plans
-              and competitive rates.
+            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-1">
+              Find a loan that fits your plans.
+            </h1>
+            <p className="text-slate-500 text-sm mt-2 max-w-lg mx-auto">
+              Share your mobile number to begin. This first step only helps us set
+              up your application — it is not a loan approval.
             </p>
           </div>
+        ) : (
+          <div className="mb-8">
+            <span className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+              LOAN APPLICATION
+            </span>
+            <h1 className="text-3xl md:text-4xl font-extrabold text-slate-900 mt-1">
+              Let's get this one clear step at a time.
+            </h1>
+            <p className="text-slate-500 text-sm mt-1">
+              Save your progress as you go. Keep your identity, income and bank
+              details ready before you begin.
+            </p>
+          </div>
+        )}
 
-          <div className="mt-10 grid gap-5 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3">
-            {LOAN_OPTIONS.map((loan) => {
-              const Icon = loan.icon;
-              return (
-                <div
-                  key={loan.title}
-                  className="group relative rounded-2xl border border-black/5 bg-white p-6 shadow-sm shadow-black/[0.03] transition-shadow hover:shadow-lg hover:shadow-brand/10"
-                >
-                  <span className="absolute right-5 top-5 whitespace-nowrap rounded-full bg-navy px-3 py-1 text-[11px] font-semibold text-white">
-                    {loan.rate}
+        {/* STEP 0: Mobile Number Entry View */}
+        {currentStep === 0 && (
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden border border-slate-100 grid grid-cols-1 md:grid-cols-12 mb-12">
+            {/* Left Info Panel */}
+            <div className="md:col-span-6 bg-[#1a234d] text-white p-8 md:p-10 flex flex-col justify-between">
+              <div>
+                <span className="text-xs text-indigo-300 font-semibold uppercase tracking-wider">
+                  START AN APPLICATION
+                </span>
+                <h2 className="text-2xl md:text-3xl font-bold mt-2">
+                  Find a loan that fits your plans.
+                </h2>
+                <p className="text-xs text-slate-300 mt-3 leading-relaxed">
+                  Share your mobile number to begin. This first step only helps us
+                  set up your application — it is not a loan approval.
+                </p>
+              </div>
+
+              <div className="space-y-4 my-8">
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-slate-700/60 text-indigo-300 text-xs flex items-center justify-center font-bold">
+                    01
                   </span>
-                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-light text-brand">
-                    <Icon className="h-6 w-6" strokeWidth={1.75} />
+                  <span className="text-xs text-slate-200">
+                    Takes about a minute to begin
                   </span>
-                  <h3 className="mt-5 text-lg font-bold text-ink">{loan.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">
-                    {loan.desc}
-                  </p>
-                  <a
-                    href="#contact"
-                    className="mt-5 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-brand py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
-                  >
-                    Apply Now
-                  </a>
                 </div>
-              );
-            })}
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------- */}
-      {/* Why choose us                                               */}
-      {/* ---------------------------------------------------------- */}
-      <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
-        <div className="text-center">
-          <h2 className="text-2xl font-extrabold text-ink sm:text-3xl md:text-4xl">
-            Why <span className="text-brand">Choose Us</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-md text-sm text-muted sm:text-base">
-            Discover how we make financing simple, transparent, and truly
-            built around you.
-          </p>
-        </div>
-
-        <div className="mt-12 flex flex-col gap-5 sm:mt-16">
-          {FEATURES.map((f, i) => {
-            const Icon = f.icon;
-            const fromRight = i % 2 === 1;
-            return (
-              <div
-                key={f.title}
-                className={`relative flex items-center gap-4 sm:w-[85%] md:w-1/2 ${
-                  fromRight ? "sm:ml-auto sm:flex-row-reverse" : ""
-                }`}
-              >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-black/5 bg-white text-brand shadow-md shadow-brand/10 sm:h-14 sm:w-14">
-                  <Icon className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={1.75} />
-                </span>
-                <div
-                  className={`flex-1 rounded-2xl border border-black/5 bg-white px-5 py-4 shadow-sm shadow-black/[0.02] sm:px-6 sm:py-5 ${
-                    fromRight ? "sm:-mr-7 sm:text-right" : "sm:-ml-7"
-                  }`}
-                >
-                  <h3 className="text-sm font-bold text-ink sm:text-base">
-                    {f.title}
-                  </h3>
-                  <p className="mt-1 text-sm leading-relaxed text-muted">
-                    {f.desc}
-                  </p>
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-slate-700/60 text-indigo-300 text-xs flex items-center justify-center font-bold">
+                    02
+                  </span>
+                  <span className="text-xs text-slate-200">
+                    Review your details before submitting
+                  </span>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-
-        <div className="mt-14 flex items-center justify-center gap-3 rounded-2xl bg-brand-light px-6 py-5 text-center">
-          <Users className="h-5 w-5 text-brand" />
-          <p className="text-sm text-ink">
-            Over <span className="font-bold text-brand">12,000+</span>{" "}
-            businesses growing with us
-          </p>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------- */}
-      {/* EMI calculator                                              */}
-      {/* ---------------------------------------------------------- */}
-      <section className="bg-[#EFEDFC] py-16 sm:py-24">
-        <div className="mx-auto max-w-5xl px-4 sm:px-6">
-          <div className="text-center">
-            <p className="text-sm font-medium text-muted">Your Monthly EMI</p>
-            <p className="mt-2 text-4xl font-extrabold text-brand sm:text-5xl">
-              {formatINR(emi)}
-            </p>
-          </div>
-
-          <div className="mt-10 grid gap-8 rounded-3xl bg-white p-6 shadow-xl shadow-brand/10 sm:mt-12 sm:p-8 md:grid-cols-[220px_1fr] md:p-10">
-            <div className="mx-auto flex flex-col items-center justify-center">
-              <svg viewBox="0 0 180 180" className="h-40 w-40 -rotate-90 sm:h-44 sm:w-44">
-                <circle
-                  cx="90"
-                  cy="90"
-                  r="70"
-                  fill="none"
-                  stroke="#EFEDFC"
-                  strokeWidth="16"
-                />
-                <circle
-                  cx="90"
-                  cy="90"
-                  r="70"
-                  fill="none"
-                  stroke="#4F3FF0"
-                  strokeWidth="16"
-                  strokeDasharray={`${principalDash} ${circumference}`}
-                  strokeLinecap="round"
-                />
-              </svg>
-              <div className="mt-4 flex gap-5 text-xs text-muted">
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-brand" /> Principal
-                </span>
-                <span className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-brand-light" /> Interest
-                </span>
+                <div className="flex items-center gap-3">
+                  <span className="w-6 h-6 rounded-full bg-slate-700/60 text-indigo-300 text-xs flex items-center justify-center font-bold">
+                    03
+                  </span>
+                  <span className="text-xs text-slate-200">
+                    Your application is handled securely
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="flex flex-col justify-center gap-6">
-              <div className="grid grid-cols-3 gap-3 sm:gap-4">
-                <div className="rounded-xl bg-[#FAFAFE] px-3 py-3 sm:px-4">
-                  <p className="text-[10px] text-muted sm:text-[11px]">Principal</p>
-                  <p className="mt-1 text-xs font-bold text-ink sm:text-sm">
-                    {formatINR(amount)}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-[#FAFAFE] px-3 py-3 sm:px-4">
-                  <p className="text-[10px] text-muted sm:text-[11px]">Interest</p>
-                  <p className="mt-1 text-xs font-bold text-ink sm:text-sm">
-                    {formatINR(interest)}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-brand-light px-3 py-3 sm:px-4">
-                  <p className="text-[10px] text-brand sm:text-[11px]">
-                    Total Payable
-                  </p>
-                  <p className="mt-1 text-xs font-bold text-brand sm:text-sm">
-                    {formatINR(total)}
-                  </p>
-                </div>
-              </div>
-
-              <div className="grid gap-6 sm:grid-cols-3">
-                <Slider
-                  label="Loan Amount"
-                  value={amount}
-                  min={50000}
-                  max={5000000}
-                  step={10000}
-                  suffix="₹"
-                  onChange={setAmount}
-                />
-                <Slider
-                  label="Tenure"
-                  value={tenure}
-                  min={3}
-                  max={84}
-                  step={1}
-                  suffix=" Months"
-                  onChange={setTenure}
-                />
-                <Slider
-                  label="Interest Rate"
-                  value={rate}
-                  min={6}
-                  max={24}
-                  step={0.1}
-                  suffix="%"
-                  onChange={setRate}
-                />
-              </div>
-
-              <a
-                href="#contact"
-                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark sm:w-fit sm:px-8"
-              >
-                Apply for This Loan
-              </a>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------- */}
-      {/* Rates & charges                                             */}
-      {/* ---------------------------------------------------------- */}
-      <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24">
-        <div className="text-center">
-          <h2 className="text-2xl font-extrabold text-ink sm:text-3xl md:text-4xl">
-            Loan Interest Rates &amp; <span className="text-brand">Charges</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-md text-sm text-muted sm:text-base">
-            Every fee and policy laid out transparently — because at{" "}
-            <span className="font-semibold text-ink">Utkarsh Capital</span>,
-            we believe clarity is the first step to trust.
-          </p>
-        </div>
-
-        <div className="mt-12 flex flex-col gap-4 sm:mt-14">
-          {CHARGES.map((c, i) => (
-            <div
-              key={c.title}
-              className="relative rounded-2xl border border-black/5 bg-white py-4 pl-14 pr-5 shadow-sm shadow-black/[0.02] sm:py-5 sm:pl-16 sm:pr-6"
-            >
-              <span className="absolute left-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-brand text-xs font-bold text-white sm:left-5 sm:top-5">
-                {String(i + 1).padStart(2, "0")}
+            {/* Right Mobile Form */}
+            <div className="md:col-span-6 p-8 md:p-10 flex flex-col justify-center">
+              <span className="text-xs font-bold text-indigo-600 uppercase">
+                Step 1 of 2
               </span>
-              <h3 className="text-sm font-bold text-ink sm:text-base">
-                {c.title}
+              <h3 className="text-xl font-bold text-slate-900 mt-1">
+                Your mobile number
               </h3>
-              <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                {c.desc}
+              <p className="text-xs text-slate-500 mb-6">
+                We will use it to continue your application and keep you updated.
               </p>
-            </div>
-          ))}
-        </div>
 
-        <p className="mt-10 rounded-2xl bg-brand-light px-6 py-4 text-center text-xs text-brand sm:text-sm">
-          Rates &amp; charges are indicative and depend on credit profile and
-          lender approval.
-        </p>
-      </section>
+              <form onSubmit={handleMobileSubmit} className="space-y-5">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-2">
+                    Mobile number
+                  </label>
+                  <div className="flex rounded-xl border border-slate-200 overflow-hidden focus-within:border-indigo-500 focus-within:ring-1 focus-within:ring-indigo-500">
+                    <span className="bg-slate-50 px-3 py-3 text-xs text-slate-500 font-medium border-r border-slate-200 flex items-center">
+                      +91
+                    </span>
+                    <input
+                      type="tel"
+                      name="mobile"
+                      required
+                      maxLength={10}
+                      value={formData.mobile}
+                      onChange={handleChange}
+                      placeholder="10-digit number"
+                      className="w-full px-3 py-3 text-xs outline-none text-slate-800 font-medium"
+                    />
+                  </div>
+                </div>
 
-      {/* ---------------------------------------------------------- */}
-      {/* FAQ                                                         */}
-      {/* ---------------------------------------------------------- */}
-      <section id="faq" className="bg-[#FAFAFE] py-16 sm:py-24">
-        <div className="mx-auto max-w-3xl px-4 sm:px-6">
-          <div className="text-center">
-            <h2 className="text-2xl font-extrabold text-ink sm:text-3xl md:text-4xl">
-              Frequently Asked Questions
-            </h2>
-            <p className="mt-4 text-sm text-muted sm:text-base">
-              Get quick answers to the most common queries about{" "}
-              <span className="font-semibold text-brand">Utkarsh Capital</span>{" "}
-              loans.
-            </p>
-          </div>
-
-          <div className="mt-10 flex flex-col gap-3 sm:mt-12">
-            {FAQS.map((item, i) => (
-              <FaqItem
-                key={item.q}
-                q={item.q}
-                a={item.a}
-                open={openFaq === i}
-                onToggle={() => setOpenFaq(openFaq === i ? null : i)}
-              />
-            ))}
-          </div>
-
-          <p className="mt-8 text-center text-sm text-muted">
-            Can&apos;t find your answer?{" "}
-            <a href="#contact" className="font-semibold text-brand underline underline-offset-2">
-              Contact support
-            </a>{" "}
-            — we&apos;re here to help.
-          </p>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------- */}
-      {/* Grievance redressal                                         */}
-      {/* ---------------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
-        <div className="grid gap-8 rounded-3xl bg-brand-light p-6 md:grid-cols-2 md:items-center md:gap-12 md:p-12">
-          <div>
-            <h2 className="text-xl font-extrabold text-ink sm:text-2xl md:text-3xl">
-              Grievance Redressal
-            </h2>
-            <p className="mt-5 text-sm leading-relaxed text-muted sm:text-base">
-              At <span className="font-semibold text-ink">Utkarsh Capital</span>,
-              we strictly adhere to RBI directives and have established a
-              robust Grievance Redressal Cell to address all concerns
-              promptly. We are committed to responsible lending, ensuring
-              that our loan offerings are convenient to repay. Our recovery
-              methods are ethical, and we never resort to coercive tactics;
-              if you have any complaints, we take them seriously and strive
-              to resolve all issues within 5 working days.
-            </p>
-            <p className="mt-4 text-xs text-muted sm:text-sm">
-              We are proudly registered as{" "}
-              <span className="font-semibold text-ink">
-                Uni-Corn Fincorp Private Limited
-              </span>
-              , a Non-Banking Financial Company (NBFC) recognized and
-              approved by the Reserve Bank of India (RBI).
-            </p>
-            <p className="mt-3 inline-block rounded-full bg-white px-4 py-2 text-[11px] font-medium text-brand shadow-sm">
-              CIN: U65923GJ2018PTC104572
-            </p>
-          </div>
-          <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-white">
-            <div className="flex flex-col items-center gap-3">
-              <span className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-light">
-                <Handshake className="h-10 w-10 text-brand" strokeWidth={1.5} />
-              </span>
-              <p className="text-sm font-semibold text-ink">
-                We&apos;re here to help
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ---------------------------------------------------------- */}
-      {/* Footer                                                      */}
-      {/* ---------------------------------------------------------- */}
-      <footer id="contact" className="bg-navy pb-24 pt-16 text-white/70 sm:pb-16">
-        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-14 sm:px-6 md:grid-cols-[1.3fr_1fr_1fr_1.3fr]">
-          <div>
-            <a href="#home" className="flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand font-extrabold text-white">
-                U
-              </span>
-              <span className="text-lg font-bold text-white">Utkarsh Capital</span>
-            </a>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed">
-              Fair, reliable loans from ₹50,000 to ₹50 lakh, tailored to your
-              needs and business financial journey.
-            </p>
-            <div className="mt-6 flex gap-3">
-              {[Facebook, Instagram, Linkedin, Twitter].map((Icon, i) => (
-                <a
-                  key={i}
-                  href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-brand"
-                >
-                  <Icon className="h-4 w-4" />
-                </a>
-              ))}
-            </div>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-bold text-white">Quick Links</h4>
-            <ul className="mt-4 flex flex-col gap-3 text-sm">
-              {["Home", "About", "FAQ", "Contact", "Apply Now"].map((l) => (
-                <li key={l}>
-                  <a href="#" className="hover:text-white">
-                    {l}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="text-sm font-bold text-white">Legal</h4>
-            <ul className="mt-4 flex flex-col gap-3 text-sm">
-              {["Refund Policy", "Terms & Conditions", "Privacy Policy"].map(
-                (l) => (
-                  <li key={l}>
-                    <a href="#" className="hover:text-white">
-                      {l}
+                <div className="flex items-start gap-2">
+                  <input
+                    type="checkbox"
+                    id="terms"
+                    checked={agreed}
+                    onChange={(e) => setAgreed(e.target.checked)}
+                    className="mt-0.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500"
+                  />
+                  <label htmlFor="terms" className="text-[11px] text-slate-500">
+                    I agree to the{" "}
+                    <a href="#" className="underline text-indigo-600">
+                      Terms
+                    </a>{" "}
+                    and{" "}
+                    <a href="#" className="underline text-indigo-600">
+                      Privacy Policy
                     </a>
-                  </li>
-                )
-              )}
-            </ul>
+                  </label>
+                </div>
+
+                <button
+                  type="submit"
+                  disabled={loading || !agreed}
+                  className="w-full bg-indigo-600 text-white font-semibold py-3 rounded-full text-xs flex items-center justify-center gap-2 hover:bg-indigo-700 transition disabled:opacity-50"
+                >
+                  {loading ? "Saving..." : "Continue"} <ArrowRight size={14} />
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* STEPS 1 TO 5: Multi-Step Application Flow */}
+        {currentStep > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 mb-12">
+            {/* Sidebar Navigation */}
+            <div className="lg:col-span-4 space-y-3">
+              {stepsList.map((step) => {
+                const Icon = step.icon;
+                const isActive = currentStep === step.id;
+                const isCompleted = currentStep > step.id;
+
+                return (
+                  <div
+                    key={step.id}
+                    className={`flex items-center gap-4 p-4 rounded-2xl transition ${
+                      isActive
+                        ? "bg-[#1a234d] text-white shadow-md"
+                        : "bg-indigo-50/50 text-slate-600 hover:bg-indigo-50"
+                    }`}
+                  >
+                    <div
+                      className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                        isActive
+                          ? "bg-indigo-600 text-white"
+                          : isCompleted
+                          ? "bg-indigo-200 text-indigo-800"
+                          : "bg-indigo-100 text-indigo-500"
+                      }`}
+                    >
+                      <Icon size={18} />
+                    </div>
+                    <div>
+                      <div
+                        className={`text-[10px] font-bold uppercase tracking-wider ${
+                          isActive ? "text-indigo-300" : "text-slate-400"
+                        }`}
+                      >
+                        STEP {step.id}
+                      </div>
+                      <div className="font-semibold text-sm">{step.label}</div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+
+            {/* Step Form Wrapper */}
+            <div className="lg:col-span-8 bg-white rounded-3xl shadow-lg border border-slate-100 overflow-hidden flex flex-col justify-between">
+              {/* Top Banner Notice */}
+              <div className="bg-[#1a234d] text-white px-6 py-3 text-xs flex items-center gap-2">
+                <span className="text-slate-300">
+                  Your information is used only to process this loan application.
+                </span>
+              </div>
+
+              <form onSubmit={handleStepSubmit} className="p-6 md:p-8 flex-grow flex flex-col justify-between">
+                <div>
+                  {/* Step 1: Personal Info */}
+                  {currentStep === 1 && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Full Name
+                          </label>
+                          <input
+                            type="text"
+                            name="fullName"
+                            required
+                            value={formData.fullName}
+                            onChange={handleChange}
+                            placeholder="Full Name"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Email
+                          </label>
+                          <input
+                            type="email"
+                            name="email"
+                            required
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="Email"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 2: Document */}
+                  {currentStep === 2 && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Aadhar Number
+                          </label>
+                          <input
+                            type="text"
+                            name="aadharNumber"
+                            required
+                            value={formData.aadharNumber}
+                            onChange={handleChange}
+                            placeholder="Aadhar Number"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            PAN Number
+                          </label>
+                          <input
+                            type="text"
+                            name="panNumber"
+                            required
+                            value={formData.panNumber}
+                            onChange={handleChange}
+                            placeholder="PAN Number"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 3: Address */}
+                  {currentStep === 3 && (
+                    <div className="space-y-4">
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-sm">
+                          Permanent Address
+                        </h4>
+                        <p className="text-[11px] text-slate-500 mb-3">
+                          Please enter the permanent address same as Aadhar card
+                        </p>
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Address
+                          </label>
+                          <input
+                            type="text"
+                            name="address"
+                            required
+                            value={formData.address}
+                            onChange={handleChange}
+                            placeholder="Enter your permanent address"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            PIN Code
+                          </label>
+                          <input
+                            type="text"
+                            name="pinCode"
+                            required
+                            value={formData.pinCode}
+                            onChange={handleChange}
+                            placeholder="PIN Code"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            State
+                          </label>
+                          <input
+                            type="text"
+                            name="state"
+                            required
+                            value={formData.state}
+                            onChange={handleChange}
+                            placeholder="State"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            City
+                          </label>
+                          <input
+                            type="text"
+                            name="city"
+                            required
+                            value={formData.city}
+                            onChange={handleChange}
+                            placeholder="City"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 4: Loan */}
+                  {currentStep === 4 && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Loan Amount
+                          </label>
+                          <input
+                            type="text"
+                            name="loanAmount"
+                            value={formData.loanAmount}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Loan Purpose
+                          </label>
+                          <select
+                            name="loanPurpose"
+                            value={formData.loanPurpose}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                          >
+                            <option value="Personal Loan">Personal Loan</option>
+                            <option value="Business Loan">Business Loan</option>
+                            <option value="Home Loan">Home Loan</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Loan Tenure (in months)
+                          </label>
+                          <select
+                            name="loanTenure"
+                            value={formData.loanTenure}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                          >
+                            <option value="12 months">12 months</option>
+                            <option value="24 months">24 months</option>
+                            <option value="36 months">36 months</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            EMI
+                          </label>
+                          <input
+                            type="text"
+                            name="emi"
+                            readOnly
+                            value={formData.emi}
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs bg-slate-50 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Interest Rate (9%)
+                          </label>
+                          <input
+                            type="text"
+                            name="interestRate"
+                            readOnly
+                            value={formData.interestRate}
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs bg-slate-50 outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Step 5: Bank */}
+                  {currentStep === 5 && (
+                    <div className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Account Holder Name
+                          </label>
+                          <input
+                            type="text"
+                            name="accountHolderName"
+                            required
+                            value={formData.accountHolderName}
+                            onChange={handleChange}
+                            placeholder="Account Holder Name"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            IFSC Code
+                          </label>
+                          <input
+                            type="text"
+                            name="ifscCode"
+                            required
+                            value={formData.ifscCode}
+                            onChange={handleChange}
+                            placeholder="IFSC Code"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Account Number
+                          </label>
+                          <input
+                            type="text"
+                            name="accountNumber"
+                            required
+                            value={formData.accountNumber}
+                            onChange={handleChange}
+                            placeholder="Account Number"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Account Type
+                          </label>
+                          <select
+                            name="accountType"
+                            value={formData.accountType}
+                            onChange={handleChange}
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none bg-white"
+                          >
+                            <option value="Savings">Savings</option>
+                            <option value="Current">Current</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Bank Name
+                          </label>
+                          <input
+                            type="text"
+                            name="bankName"
+                            required
+                            value={formData.bankName}
+                            onChange={handleChange}
+                            placeholder="Bank Name"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs font-semibold text-slate-700 mb-1">
+                            Branch
+                          </label>
+                          <input
+                            type="text"
+                            name="branch"
+                            required
+                            value={formData.branch}
+                            onChange={handleChange}
+                            placeholder="Branch Name"
+                            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-xs focus:ring-2 focus:ring-indigo-500 outline-none"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                {/* Bottom Navigation Buttons */}
+                <div className="pt-8 mt-6 border-t border-slate-100 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentStep((prev) => prev - 1)}
+                    className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-800 transition"
+                  >
+                    <ArrowLeft size={14} /> Back
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="bg-indigo-600 text-white font-semibold px-6 py-2.5 rounded-full text-xs flex items-center gap-2 hover:bg-indigo-700 transition"
+                  >
+                    {loading
+                      ? "Processing..."
+                      : currentStep === 5
+                      ? "Submit"
+                      : "Continue"}{" "}
+                    <ArrowRight size={14} />
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
+
+        {/* Bottom Feature Badges (Mobile View Step Only) */}
+        {currentStep === 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-12">
+            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-3">
+              <div className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Check size={14} />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-800">No cost to check</h4>
+                <p className="text-[11px] text-slate-500">
+                  Starting an application does not create a loan.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-3">
+              <div className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Check size={14} />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-800">Clear next steps</h4>
+                <p className="text-[11px] text-slate-500">
+                  We explain what information is needed at each stage.
+                </p>
+              </div>
+            </div>
+
+            <div className="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-start gap-3">
+              <div className="w-6 h-6 rounded-full bg-indigo-50 text-indigo-600 flex items-center justify-center flex-shrink-0 mt-0.5">
+                <Check size={14} />
+              </div>
+              <div>
+                <h4 className="text-xs font-bold text-slate-800">You stay in control</h4>
+                <p className="text-[11px] text-slate-500">
+                  Review the offer and lender terms before accepting.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Footer Section: Disclosure & Information */}
+        <section className="mt-8 space-y-6">
+          <h2 className="text-xl font-bold text-slate-900">
+            Disclosure & Information.
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="bg-white p-5 rounded-2xl border border-slate-100 text-xs space-y-2">
+              <div className="flex items-center gap-2 font-bold text-slate-800 mb-2">
+                <Clock size={14} className="text-indigo-600" /> Rates & Charges
+              </div>
+              <ul className="space-y-1 text-slate-600 list-disc list-inside text-[11px]">
+                <li>Loan: ₹50,000 – ₹5,00,000</li>
+                <li>Tenure: 6–60 months</li>
+                <li>Processing Fee: 2–5%</li>
+                <li>No Pre-closure/Prepayment Charges</li>
+                <li>ROI: 1.16% Monthly</li>
+                <li>APR: 16% to 30%</li>
+                <li>Cheque Bounce: ₹1,000</li>
+              </ul>
+            </div>
+
+            <div className="bg-white p-5 rounded-2xl border border-slate-100 text-xs space-y-2">
+              <div className="flex items-center gap-2 font-bold text-slate-800 mb-2">
+                <Sliders size={14} className="text-indigo-600" /> How is APR Determined?
+              </div>
+              <p className="text-slate-600 text-[11px] leading-relaxed">
+                Based on credit score, income, and loan amount. Fixed APR range:
+                16% to 30%.
+              </p>
+            </div>
           </div>
 
+          {/* Eligibility Criteria */}
+          <div className="bg-white p-5 rounded-2xl border border-slate-100 text-xs">
+            <h3 className="font-bold text-slate-800 mb-3 flex items-center gap-2">
+              <ShieldCheck size={14} className="text-indigo-600" /> Documents Required & Eligibility Criteria
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-[11px] text-slate-600">
+              <div>
+                <span className="font-semibold text-slate-800 block mb-1">
+                  Eligibility Criteria
+                </span>
+                <ul className="space-y-1 list-disc list-inside">
+                  <li>Filled Loan Application</li>
+                  <li>ID Proof (PAN, Aadhaar, etc.)</li>
+                  <li>Residence Proof</li>
+                  <li>6 months Bank Statements</li>
+                  <li>3 months Salary Slips</li>
+                  <li>6+ months in current job</li>
+                </ul>
+              </div>
+              <div>
+                <span className="font-semibold text-slate-800 block mb-1">
+                  Documents Required
+                </span>
+                <ul className="space-y-1 list-disc list-inside">
+                  <li>Indian Citizen</li>
+                  <li>Salaried Employee</li>
+                  <li>Min Age: 18</li>
+                  <li>Savings Account</li>
+                  <li>CIBIL Score 550+</li>
+                  <li>Monthly Income ₹13,500+</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      {/* Footer */}
+      <footer className="bg-[#1a234d] text-white py-10 px-6 md:px-12 mt-12 text-xs">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
-            <h4 className="text-sm font-bold text-white">Contact Us</h4>
-            <ul className="mt-4 flex flex-col gap-3 text-sm">
-              <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-brand-light" /> info@utkarshcapital.com
-              </li>
-              <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 shrink-0 text-brand-light" />
-                4th street, Colva, Goa, 403708
-              </li>
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-6 h-6 bg-indigo-600 rounded flex items-center justify-center font-bold text-white text-xs">
+                U
+              </div>
+              <span className="font-bold text-sm">Utkarsh Capital</span>
+            </div>
+            <p className="text-slate-400 leading-relaxed text-[11px]">
+              Fast, reliable loans from ₹55,000 to ₹40 lakh. We're here to simplify
+              your personal and business financial journey.
+            </p>
+          </div>
+          <div>
+            <h5 className="font-bold mb-3 text-slate-200">Quick Links</h5>
+            <ul className="space-y-1.5 text-slate-400 text-[11px]">
+              <li><a href="#" className="hover:underline">Home</a></li>
+              <li><a href="#" className="hover:underline">About</a></li>
+              <li><a href="#" className="hover:underline">FAQ</a></li>
+              <li><a href="#" className="hover:underline">Contact</a></li>
+              <li><a href="#" className="hover:underline">Apply Now</a></li>
             </ul>
+          </div>
+          <div>
+            <h5 className="font-bold mb-3 text-slate-200">Contact Us</h5>
+            <p className="text-slate-400 text-[11px]">Email: info@utkarshcapital.com</p>
+            <p className="text-slate-400 text-[11px] mt-1">
+              Address: 4th ward, Colva, South Goa, Goa, 403708
+            </p>
           </div>
         </div>
-
-        <div className="border-t border-white/10 py-6">
-          <p className="text-center text-xs text-white/40">
-            © {new Date().getFullYear()} Utkarsh Capital. All rights reserved.
-          </p>
+        <div className="max-w-6xl mx-auto border-t border-slate-700/60 mt-8 pt-6 flex flex-col md:flex-row justify-between text-[10px] text-slate-400">
+          <div>
+            <a href="#" className="hover:underline mr-4">Refund Policy</a>
+            <a href="#" className="hover:underline mr-4">Privacy Policy</a>
+            <a href="#" className="hover:underline mr-4">Terms of Use</a>
+            <a href="#" className="hover:underline">Terms & Conditions</a>
+          </div>
+          <div className="mt-2 md:mt-0">
+            © 2026 UtkarshCapital. All rights reserved.
+          </div>
         </div>
       </footer>
-
-      {/* ---------------------------------------------------------- */}
-      {/* Mobile sticky CTA                                           */}
-      {/* ---------------------------------------------------------- */}
-      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-black/5 bg-white/95 p-3 backdrop-blur sm:hidden">
-        <a
-          href="#home"
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-brand py-3 text-sm font-semibold text-white"
-        >
-          Apply Now <ArrowRight className="h-4 w-4" />
-        </a>
-      </div>
-    </main>
+    </div>
   );
 }
