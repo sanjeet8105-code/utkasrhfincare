@@ -1,0 +1,16 @@
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL as string;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY as string;
+
+if (!supabaseUrl || !supabaseAnonKey) {
+  // This only warns at build/runtime in the browser console — it won't crash
+  // the app, but Supabase calls will fail until you add the env vars.
+  // See SUPABASE_SETUP.md for instructions.
+  // eslint-disable-next-line no-console
+  console.warn(
+    "Supabase env vars are missing. Add NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local"
+  );
+}
+
+export const supabase = createClient(supabaseUrl, supabaseAnonKey);
