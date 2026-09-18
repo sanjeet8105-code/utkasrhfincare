@@ -26,6 +26,11 @@ import {
   Menu,
   X,
   ArrowRight,
+  Star,
+  User,
+  BarChart3,
+  Calculator,
+  Users,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -204,9 +209,9 @@ function Slider({
 }) {
   return (
     <div>
-      <div className="flex items-baseline justify-between text-sm">
-        <span className="text-white/60">{label}</span>
-        <span className="font-semibold text-white">
+      <div className="flex items-baseline justify-between text-xs sm:text-sm">
+        <span className="text-muted">{label}</span>
+        <span className="font-semibold text-ink">
           {suffix === "₹" ? formatINR(value) : `${value}${suffix}`}
         </span>
       </div>
@@ -217,7 +222,7 @@ function Slider({
         step={step}
         value={value}
         onChange={(e) => onChange(Number(e.target.value))}
-        className="mt-3 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-white/15 accent-[#C89B3C]"
+        className="mt-3 h-1.5 w-full cursor-pointer appearance-none rounded-full bg-brand/15 accent-[#4F3FF0]"
       />
     </div>
   );
@@ -235,12 +240,21 @@ function FaqItem({
   onToggle: () => void;
 }) {
   return (
-    <div className="border-b border-[#E4E0D6]">
+    <div
+      className={`rounded-2xl border bg-white transition-colors ${
+        open ? "border-brand/30" : "border-black/5"
+      }`}
+    >
       <button
         onClick={onToggle}
-        className="flex w-full items-center justify-between gap-6 py-5 text-left"
+        className="flex w-full items-center gap-4 px-5 py-4 text-left sm:px-6"
       >
-        <span className="font-serif text-lg text-ink">{q}</span>
+        <Star
+          className={`h-4 w-4 shrink-0 ${open ? "fill-brand text-brand" : "text-brand/40"}`}
+        />
+        <span className="flex-1 text-sm font-semibold text-ink sm:text-base">
+          {q}
+        </span>
         <ChevronDown
           className={`h-5 w-5 shrink-0 text-brand transition-transform duration-300 ${
             open ? "rotate-180" : ""
@@ -249,12 +263,13 @@ function FaqItem({
       </button>
       <div
         className={`grid transition-all duration-300 ease-out ${
-          open ? "grid-rows-[1fr] pb-5 opacity-100" : "grid-rows-[0fr] opacity-0"
+          open ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
         }`}
-        style={{ display: "grid" }}
       >
         <div className="overflow-hidden">
-          <p className="max-w-2xl text-sm leading-relaxed text-muted">{a}</p>
+          <p className="px-5 pb-5 pl-14 text-sm leading-relaxed text-muted sm:px-6 sm:pb-6 sm:pl-16">
+            {a}
+          </p>
         </div>
       </div>
     </div>
@@ -293,39 +308,44 @@ export default function Home() {
   const principalDash = circumference * principalShare;
 
   return (
-    <main className="bg-cream font-sans text-ink antialiased">
+    <main className="bg-white font-sans text-ink antialiased">
       {/* ---------------------------------------------------------- */}
       {/* Header                                                     */}
       {/* ---------------------------------------------------------- */}
-      <header className="sticky top-0 z-50 border-b border-[#E4E0D6] bg-cream/95 backdrop-blur">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <header className="sticky top-0 z-50 border-b border-black/5 bg-white/95 backdrop-blur">
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3.5 sm:px-6">
           <a href="#home" className="flex items-center gap-2">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand font-serif text-base text-white">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand font-extrabold text-white">
               U
             </span>
-            <span className="font-serif text-lg tracking-tight text-ink">
+            <span className="text-base font-bold tracking-tight text-ink sm:text-lg">
               Utkarsh Capital
             </span>
           </a>
 
-          <nav className="hidden items-center gap-9 md:flex">
+          <nav className="hidden items-center gap-8 md:flex">
             {NAV_LINKS.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
-                className="text-sm text-ink/70 transition-colors hover:text-ink"
+                className="text-sm font-medium text-ink/70 transition-colors hover:text-brand"
               >
                 {link.label}
               </a>
             ))}
           </nav>
 
-          <div className="hidden items-center gap-2 text-sm text-ink/70 md:flex">
-            <span>Member since 2019</span>
+          <div className="hidden items-center gap-2 md:flex">
+            <a
+              href="#contact"
+              className="flex items-center gap-2 rounded-full border border-black/10 px-4 py-2 text-sm font-medium text-ink/70 transition-colors hover:border-brand hover:text-brand"
+            >
+              <User className="h-4 w-4" /> Login
+            </a>
           </div>
 
           <button
-            className="md:hidden"
+            className="text-ink md:hidden"
             onClick={() => setMenuOpen((v) => !v)}
             aria-label="Toggle menu"
           >
@@ -334,14 +354,14 @@ export default function Home() {
         </div>
 
         {menuOpen && (
-          <div className="border-t border-[#E4E0D6] bg-cream px-6 pb-6 md:hidden">
-            <nav className="flex flex-col gap-4 pt-4">
+          <div className="border-t border-black/5 bg-white px-4 pb-5 sm:px-6 md:hidden">
+            <nav className="flex flex-col gap-1 pt-3">
               {NAV_LINKS.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="text-sm text-ink/80"
+                  className="rounded-lg px-2 py-2.5 text-sm font-medium text-ink/80 hover:bg-brand/5"
                 >
                   {link.label}
                 </a>
@@ -354,66 +374,63 @@ export default function Home() {
       {/* ---------------------------------------------------------- */}
       {/* Hero                                                        */}
       {/* ---------------------------------------------------------- */}
-      <section id="home" className="relative overflow-hidden bg-ink">
-        {/* decorative concentric rings, not a stock gradient blob */}
-        <svg
-          className="pointer-events-none absolute -right-24 top-1/2 hidden h-[560px] w-[560px] -translate-y-1/2 opacity-70 md:block"
-          viewBox="0 0 560 560"
-          fill="none"
-        >
-          {[260, 210, 160, 110, 60].map((r, i) => (
-            <circle
-              key={r}
-              cx="280"
-              cy="280"
-              r={r}
-              stroke={i % 2 === 0 ? "#C89B3C" : "#4F42B0"}
-              strokeOpacity={0.35}
-              strokeWidth="1"
-            />
-          ))}
-          <circle cx="280" cy="280" r="34" fill="#C89B3C" fillOpacity="0.9" />
-        </svg>
+      <section
+        id="home"
+        className="relative overflow-hidden bg-gradient-to-br from-brand-deep via-[#2E2494] to-brand"
+      >
+        {/* decorative glow + floating icon chips, not a stock photo */}
+        <div className="pointer-events-none absolute -right-24 -top-24 h-72 w-72 rounded-full bg-white/10 blur-3xl sm:h-96 sm:w-96" />
+        <div className="pointer-events-none absolute right-6 top-24 hidden flex-col gap-4 sm:right-10 md:flex">
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur">
+            <Calculator className="h-6 w-6 text-white/80" strokeWidth={1.5} />
+          </div>
+          <div className="ml-10 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur">
+            <BarChart3 className="h-6 w-6 text-white/80" strokeWidth={1.5} />
+          </div>
+          <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur">
+            <TrendingUp className="h-6 w-6 text-white/80" strokeWidth={1.5} />
+          </div>
+        </div>
 
-        <div className="relative mx-auto max-w-7xl px-6 py-24 md:py-32">
-          <div className="max-w-2xl">
-            <h1 className="font-serif text-5xl leading-[1.08] text-white md:text-6xl">
-              Unlock your financial freedom
+        <div className="relative mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24 md:py-28">
+          <div className="max-w-2xl text-center sm:text-left">
+            <h1 className="text-[2.25rem] font-extrabold leading-[1.15] text-white sm:text-5xl md:text-[3.4rem]">
+              Unlock Your Financial Freedom
             </h1>
-            <p className="mt-6 max-w-md text-base leading-relaxed text-white/70">
-              Simple, secure, and smart personal loans — tailored to your
-              journey, with flexible EMIs and support you can trust.
+            <p className="mx-auto mt-5 max-w-md text-sm leading-relaxed text-white/75 sm:mx-0 sm:text-base">
+              Simple, secure, and smart personal loans. Tailored for your
+              journey — with flexible EMIs and trusted support.
             </p>
 
             <form
               onSubmit={(e) => e.preventDefault()}
-              className="mt-10 flex max-w-md flex-col gap-3 sm:flex-row"
+              className="mx-auto mt-8 flex max-w-md flex-col gap-3 sm:mx-0 sm:flex-row"
             >
-              <div className="flex flex-1 items-center gap-2 rounded-lg border border-white/15 bg-white/5 px-4 py-3.5">
-                <Phone className="h-4 w-4 text-white/40" />
-                <span className="text-sm text-white/50">+91</span>
+              <div className="flex flex-1 items-center gap-2 rounded-full bg-white px-4 py-3.5 shadow-lg shadow-black/10">
+                <Phone className="h-4 w-4 text-brand/60" />
+                <span className="text-sm text-ink/50">+91</span>
                 <input
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   placeholder="Enter mobile number"
-                  className="w-full bg-transparent text-sm text-white placeholder:text-white/40 focus:outline-none"
+                  className="w-full bg-transparent text-sm text-ink placeholder:text-ink/40 focus:outline-none"
                 />
               </div>
               <button
                 type="submit"
-                className="whitespace-nowrap rounded-lg bg-gold px-6 py-3.5 text-sm font-semibold text-ink transition-colors hover:bg-[#DBB65C]"
+                className="inline-flex items-center justify-center gap-1.5 whitespace-nowrap rounded-full bg-ink px-6 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-black"
               >
-                Apply Now
+                Apply Now <ArrowRight className="h-4 w-4" />
               </button>
             </form>
 
-            <label className="mt-4 flex items-center gap-2 text-xs text-white/50">
+            <label className="mx-auto mt-4 flex w-fit items-center gap-2 text-xs text-white/60 sm:mx-0">
               <input
                 type="checkbox"
                 checked={agree}
                 onChange={(e) => setAgree(e.target.checked)}
-                className="h-3.5 w-3.5 accent-[#C89B3C]"
+                className="h-3.5 w-3.5 accent-white"
               />
               I agree to the{" "}
               <a href="#" className="underline underline-offset-2">
@@ -425,15 +442,15 @@ export default function Home() {
               </a>
             </label>
 
-            <div className="mt-10 flex flex-wrap gap-x-8 gap-y-3 border-t border-white/10 pt-6 text-xs text-white/60">
+            <div className="mx-auto mt-10 flex max-w-md flex-wrap justify-center gap-x-8 gap-y-3 border-t border-white/15 pt-6 text-xs text-white/70 sm:mx-0 sm:justify-start">
               <span className="flex items-center gap-2">
-                <ShieldCheck className="h-4 w-4 text-gold" /> Trusted
+                <ShieldCheck className="h-4 w-4 text-white" /> Trusted
               </span>
               <span className="flex items-center gap-2">
-                <PiggyBank className="h-4 w-4 text-gold" /> Savings
+                <PiggyBank className="h-4 w-4 text-white" /> Savings
               </span>
               <span className="flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-gold" /> Growth
+                <TrendingUp className="h-4 w-4 text-white" /> Growth
               </span>
             </div>
           </div>
@@ -443,14 +460,29 @@ export default function Home() {
       {/* ---------------------------------------------------------- */}
       {/* Who we are                                                  */}
       {/* ---------------------------------------------------------- */}
-      <section id="about" className="mx-auto max-w-7xl px-6 py-24">
-        <div className="grid gap-14 md:grid-cols-2 md:items-center">
-          <div className="relative">
-            <div className="flex aspect-[4/3] items-center justify-center rounded-2xl border border-[#E4E0D6] bg-white">
-              <Globe2 className="h-28 w-28 text-brand/25" strokeWidth={1} />
+      <section id="about" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
+        <div className="grid gap-10 md:grid-cols-2 md:items-center md:gap-14">
+          <div className="relative order-2 md:order-1">
+            <div className="flex aspect-[4/3] items-center justify-center rounded-3xl bg-brand-light">
+              <div className="grid grid-cols-2 gap-5">
+                <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-md shadow-brand/10 sm:h-24 sm:w-24">
+                  <Globe2 className="h-10 w-10 text-brand" strokeWidth={1.5} />
+                </div>
+                <div className="mt-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-md shadow-brand/10 sm:h-24 sm:w-24">
+                  <BarChart3 className="h-10 w-10 text-brand" strokeWidth={1.5} />
+                </div>
+                <div className="flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-md shadow-brand/10 sm:h-24 sm:w-24">
+                  <Calculator className="h-10 w-10 text-brand" strokeWidth={1.5} />
+                </div>
+                <div className="mt-8 flex h-20 w-20 items-center justify-center rounded-2xl bg-white shadow-md shadow-brand/10 sm:h-24 sm:w-24">
+                  <TrendingUp className="h-10 w-10 text-brand" strokeWidth={1.5} />
+                </div>
+              </div>
             </div>
-            <div className="absolute -bottom-6 left-6 flex items-center gap-3 rounded-xl border border-[#E4E0D6] bg-white px-5 py-4 shadow-[0_12px_30px_-12px_rgba(23,19,55,0.25)]">
-              <ShieldCheck className="h-8 w-8 text-brand" />
+            <div className="absolute -bottom-6 left-1/2 flex -translate-x-1/2 items-center gap-3 rounded-2xl border border-black/5 bg-white px-5 py-4 shadow-xl shadow-brand/10 sm:left-6 sm:translate-x-0">
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand/10">
+                <ShieldCheck className="h-5 w-5 text-brand" />
+              </span>
               <div className="text-sm">
                 <p className="font-semibold text-ink">Finance with Trust</p>
                 <p className="text-xs text-muted">RBI-recognized NBFC partner</p>
@@ -458,33 +490,36 @@ export default function Home() {
             </div>
           </div>
 
-          <div>
-            <h2 className="font-serif text-3xl leading-tight text-ink md:text-4xl">
-              Simple, secure &amp; built for growth
+          <div className="order-1 text-center md:order-2 md:text-left">
+            <span className="inline-block rounded-full bg-brand-light px-4 py-1.5 text-xs font-semibold text-brand">
+              Who We Are
+            </span>
+            <h2 className="mt-4 text-2xl font-extrabold leading-tight text-ink sm:text-3xl md:text-4xl">
+              Simple, Secure &amp; Built for Growth
             </h2>
-            <p className="mt-5 max-w-lg text-sm leading-relaxed text-muted">
+            <p className="mx-auto mt-4 max-w-lg text-sm leading-relaxed text-muted sm:text-base md:mx-0">
               We&apos;re not just another credit platform. We&apos;re your
               growth partner — helping you save smarter, borrow with
               confidence, and build wealth step by step.
             </p>
 
-            <div className="mt-8 flex flex-wrap gap-8 text-sm">
-              <span className="flex items-center gap-2 text-ink/80">
+            <div className="mt-7 flex flex-wrap justify-center gap-6 text-sm md:justify-start">
+              <span className="flex items-center gap-2 font-medium text-ink/80">
                 <ShieldCheck className="h-4 w-4 text-brand" /> Trusted
               </span>
-              <span className="flex items-center gap-2 text-ink/80">
+              <span className="flex items-center gap-2 font-medium text-ink/80">
                 <PiggyBank className="h-4 w-4 text-brand" /> Smart
               </span>
-              <span className="flex items-center gap-2 text-ink/80">
+              <span className="flex items-center gap-2 font-medium text-ink/80">
                 <TrendingUp className="h-4 w-4 text-brand" /> Growth
               </span>
             </div>
 
             <a
               href="#about"
-              className="mt-8 inline-flex items-center gap-2 rounded-lg border border-ink px-6 py-3 text-sm font-medium text-ink transition-colors hover:bg-ink hover:text-white"
+              className="mt-8 inline-flex items-center gap-2 rounded-full border-2 border-brand px-6 py-3 text-sm font-semibold text-brand transition-colors hover:bg-brand hover:text-white"
             >
-              Explore our story <ArrowRight className="h-4 w-4" />
+              Explore Our Story <ArrowRight className="h-4 w-4" />
             </a>
           </div>
         </div>
@@ -493,50 +528,44 @@ export default function Home() {
       {/* ---------------------------------------------------------- */}
       {/* Loan options                                                */}
       {/* ---------------------------------------------------------- */}
-      <section id="loans" className="border-y border-[#E4E0D6] bg-white py-24">
-        <div className="mx-auto max-w-7xl px-6">
-          <div className="max-w-2xl">
-            <h2 className="font-serif text-3xl text-ink md:text-4xl">
-              Explore our loan options
+      <section id="loans" className="bg-[#FAFAFE] py-16 sm:py-24">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6">
+          <div className="mx-auto max-w-2xl text-center">
+            <h2 className="text-2xl font-extrabold text-ink sm:text-3xl md:text-4xl">
+              Explore Our Loan Options
             </h2>
-            <p className="mt-4 text-sm leading-relaxed text-muted">
-              At Utkarsh Capital, we strictly practice robust, responsible
-              lending — from personal needs to big dreams, choose the right
-              loan with flexible plans and competitive rates.
+            <p className="mt-4 text-sm leading-relaxed text-muted sm:text-base">
+              <span className="font-semibold text-brand">Utkarsh Capital</span>{" "}
+              strictly practices robust, responsible lending. From personal
+              needs to big dreams — choose the right loan with flexible plans
+              and competitive rates.
             </p>
           </div>
 
-          <div className="mt-12 grid divide-y divide-[#E4E0D6] border-y border-[#E4E0D6] md:grid-cols-2 md:divide-x md:divide-y-0">
-            {LOAN_OPTIONS.map((loan, i) => {
+          <div className="mt-10 grid gap-5 sm:mt-14 sm:grid-cols-2 lg:grid-cols-3">
+            {LOAN_OPTIONS.map((loan) => {
               const Icon = loan.icon;
               return (
                 <div
                   key={loan.title}
-                  className={`group relative flex items-start gap-5 px-2 py-8 md:px-8 ${
-                    i >= 2 ? "border-t border-[#E4E0D6] md:border-t" : ""
-                  }`}
+                  className="group relative rounded-2xl border border-black/5 bg-white p-6 shadow-sm shadow-black/[0.03] transition-shadow hover:shadow-lg hover:shadow-brand/10"
                 >
-                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-brand/8 text-brand">
-                    <Icon className="h-5 w-5" strokeWidth={1.5} />
+                  <span className="absolute right-5 top-5 whitespace-nowrap rounded-full bg-navy px-3 py-1 text-[11px] font-semibold text-white">
+                    {loan.rate}
                   </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-3">
-                      <h3 className="font-serif text-lg text-ink">{loan.title}</h3>
-                      <span className="whitespace-nowrap rounded-full bg-gold/15 px-3 py-1 text-[11px] font-medium text-[#8A6A1F]">
-                        {loan.rate}
-                      </span>
-                    </div>
-                    <p className="mt-2 text-sm leading-relaxed text-muted">
-                      {loan.desc}
-                    </p>
-                    <a
-                      href="#contact"
-                      className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-brand"
-                    >
-                      Apply Now
-                      <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                    </a>
-                  </div>
+                  <span className="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-light text-brand">
+                    <Icon className="h-6 w-6" strokeWidth={1.75} />
+                  </span>
+                  <h3 className="mt-5 text-lg font-bold text-ink">{loan.title}</h3>
+                  <p className="mt-2 text-sm leading-relaxed text-muted">
+                    {loan.desc}
+                  </p>
+                  <a
+                    href="#contact"
+                    className="mt-5 inline-flex w-full items-center justify-center gap-1.5 rounded-full bg-brand py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark"
+                  >
+                    Apply Now
+                  </a>
                 </div>
               );
             })}
@@ -547,81 +576,78 @@ export default function Home() {
       {/* ---------------------------------------------------------- */}
       {/* Why choose us                                               */}
       {/* ---------------------------------------------------------- */}
-      <section className="mx-auto max-w-4xl px-6 py-24">
+      <section className="mx-auto max-w-4xl px-4 py-16 sm:px-6 sm:py-24">
         <div className="text-center">
-          <h2 className="font-serif text-3xl text-ink md:text-4xl">Why choose us</h2>
-          <span className="mx-auto mt-4 block h-px w-16 bg-gold" />
-          <p className="mx-auto mt-5 max-w-md text-sm text-muted">
+          <h2 className="text-2xl font-extrabold text-ink sm:text-3xl md:text-4xl">
+            Why <span className="text-brand">Choose Us</span>
+          </h2>
+          <p className="mx-auto mt-4 max-w-md text-sm text-muted sm:text-base">
             Discover how we make financing simple, transparent, and truly
             built around you.
           </p>
         </div>
 
-        <div className="relative mt-16">
-          <span className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-[#E4E0D6] md:block" />
-          <div className="flex flex-col gap-4">
-            {FEATURES.map((f, i) => {
-              const Icon = f.icon;
-              const fromRight = i % 2 === 1;
-              return (
+        <div className="mt-12 flex flex-col gap-5 sm:mt-16">
+          {FEATURES.map((f, i) => {
+            const Icon = f.icon;
+            const fromRight = i % 2 === 1;
+            return (
+              <div
+                key={f.title}
+                className={`relative flex items-center gap-4 sm:w-[85%] md:w-1/2 ${
+                  fromRight ? "sm:ml-auto sm:flex-row-reverse" : ""
+                }`}
+              >
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-black/5 bg-white text-brand shadow-md shadow-brand/10 sm:h-14 sm:w-14">
+                  <Icon className="h-5 w-5 sm:h-6 sm:w-6" strokeWidth={1.75} />
+                </span>
                 <div
-                  key={f.title}
-                  className={`relative flex md:w-1/2 ${
-                    fromRight ? "md:ml-auto md:flex-row-reverse md:text-right" : ""
+                  className={`flex-1 rounded-2xl border border-black/5 bg-white px-5 py-4 shadow-sm shadow-black/[0.02] sm:px-6 sm:py-5 ${
+                    fromRight ? "sm:-mr-7 sm:text-right" : "sm:-ml-7"
                   }`}
                 >
-                  <div
-                    className={`flex items-center gap-4 rounded-xl border border-[#E4E0D6] bg-white px-6 py-5 ${
-                      fromRight ? "md:mr-8" : "md:ml-8"
-                    }`}
-                  >
-                    <span
-                      className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand/8 text-brand ${
-                        fromRight ? "md:order-2" : ""
-                      }`}
-                    >
-                      <Icon className="h-5 w-5" strokeWidth={1.5} />
-                    </span>
-                    <div>
-                      <h3 className="font-serif text-base text-ink">{f.title}</h3>
-                      <p className="mt-1 text-sm leading-relaxed text-muted">
-                        {f.desc}
-                      </p>
-                    </div>
-                  </div>
+                  <h3 className="text-sm font-bold text-ink sm:text-base">
+                    {f.title}
+                  </h3>
+                  <p className="mt-1 text-sm leading-relaxed text-muted">
+                    {f.desc}
+                  </p>
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            );
+          })}
         </div>
 
-        <p className="mt-16 text-center text-sm text-muted">
-          Over <span className="font-semibold text-ink">12,000+</span> businesses
-          growing with us
-        </p>
+        <div className="mt-14 flex items-center justify-center gap-3 rounded-2xl bg-brand-light px-6 py-5 text-center">
+          <Users className="h-5 w-5 text-brand" />
+          <p className="text-sm text-ink">
+            Over <span className="font-bold text-brand">12,000+</span>{" "}
+            businesses growing with us
+          </p>
+        </div>
       </section>
 
       {/* ---------------------------------------------------------- */}
       {/* EMI calculator                                              */}
       {/* ---------------------------------------------------------- */}
-      <section className="bg-ink py-24">
-        <div className="mx-auto max-w-5xl px-6">
+      <section className="bg-[#EFEDFC] py-16 sm:py-24">
+        <div className="mx-auto max-w-5xl px-4 sm:px-6">
           <div className="text-center">
-            <p className="text-sm text-white/50">Your Monthly EMI</p>
-            <p className="mt-2 font-serif text-5xl text-white">
+            <p className="text-sm font-medium text-muted">Your Monthly EMI</p>
+            <p className="mt-2 text-4xl font-extrabold text-brand sm:text-5xl">
               {formatINR(emi)}
             </p>
           </div>
 
-          <div className="mt-12 grid gap-10 rounded-2xl border border-white/10 bg-white/[0.03] p-8 md:grid-cols-[220px_1fr] md:p-10">
+          <div className="mt-10 grid gap-8 rounded-3xl bg-white p-6 shadow-xl shadow-brand/10 sm:mt-12 sm:p-8 md:grid-cols-[220px_1fr] md:p-10">
             <div className="mx-auto flex flex-col items-center justify-center">
-              <svg viewBox="0 0 180 180" className="h-44 w-44 -rotate-90">
+              <svg viewBox="0 0 180 180" className="h-40 w-40 -rotate-90 sm:h-44 sm:w-44">
                 <circle
                   cx="90"
                   cy="90"
                   r="70"
                   fill="none"
-                  stroke="#4F42B0"
+                  stroke="#EFEDFC"
                   strokeWidth="16"
                 />
                 <circle
@@ -629,15 +655,15 @@ export default function Home() {
                   cy="90"
                   r="70"
                   fill="none"
-                  stroke="#C89B3C"
+                  stroke="#4F3FF0"
                   strokeWidth="16"
                   strokeDasharray={`${principalDash} ${circumference}`}
                   strokeLinecap="round"
                 />
               </svg>
-              <div className="mt-4 flex gap-5 text-xs text-white/60">
+              <div className="mt-4 flex gap-5 text-xs text-muted">
                 <span className="flex items-center gap-1.5">
-                  <span className="h-2 w-2 rounded-full bg-gold" /> Principal
+                  <span className="h-2 w-2 rounded-full bg-brand" /> Principal
                 </span>
                 <span className="flex items-center gap-1.5">
                   <span className="h-2 w-2 rounded-full bg-brand-light" /> Interest
@@ -646,22 +672,24 @@ export default function Home() {
             </div>
 
             <div className="flex flex-col justify-center gap-6">
-              <div className="grid grid-cols-3 gap-4">
-                <div className="rounded-lg border border-white/10 px-4 py-3">
-                  <p className="text-[11px] text-white/50">Principal</p>
-                  <p className="mt-1 text-sm font-semibold text-white">
+              <div className="grid grid-cols-3 gap-3 sm:gap-4">
+                <div className="rounded-xl bg-[#FAFAFE] px-3 py-3 sm:px-4">
+                  <p className="text-[10px] text-muted sm:text-[11px]">Principal</p>
+                  <p className="mt-1 text-xs font-bold text-ink sm:text-sm">
                     {formatINR(amount)}
                   </p>
                 </div>
-                <div className="rounded-lg border border-white/10 px-4 py-3">
-                  <p className="text-[11px] text-white/50">Interest</p>
-                  <p className="mt-1 text-sm font-semibold text-white">
+                <div className="rounded-xl bg-[#FAFAFE] px-3 py-3 sm:px-4">
+                  <p className="text-[10px] text-muted sm:text-[11px]">Interest</p>
+                  <p className="mt-1 text-xs font-bold text-ink sm:text-sm">
                     {formatINR(interest)}
                   </p>
                 </div>
-                <div className="rounded-lg border border-gold/30 bg-gold/10 px-4 py-3">
-                  <p className="text-[11px] text-white/50">Total Payable</p>
-                  <p className="mt-1 text-sm font-semibold text-white">
+                <div className="rounded-xl bg-brand-light px-3 py-3 sm:px-4">
+                  <p className="text-[10px] text-brand sm:text-[11px]">
+                    Total Payable
+                  </p>
+                  <p className="mt-1 text-xs font-bold text-brand sm:text-sm">
                     {formatINR(total)}
                   </p>
                 </div>
@@ -699,7 +727,7 @@ export default function Home() {
 
               <a
                 href="#contact"
-                className="mt-2 inline-flex w-fit items-center gap-2 rounded-lg bg-gold px-6 py-3 text-sm font-semibold text-ink transition-colors hover:bg-[#DBB65C]"
+                className="mt-2 inline-flex w-full items-center justify-center gap-2 rounded-full bg-brand py-3.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark sm:w-fit sm:px-8"
               >
                 Apply for This Loan
               </a>
@@ -711,35 +739,38 @@ export default function Home() {
       {/* ---------------------------------------------------------- */}
       {/* Rates & charges                                             */}
       {/* ---------------------------------------------------------- */}
-      <section className="mx-auto max-w-3xl px-6 py-24">
+      <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 sm:py-24">
         <div className="text-center">
-          <h2 className="font-serif text-3xl text-ink md:text-4xl">
-            Loan interest rates &amp; charges
+          <h2 className="text-2xl font-extrabold text-ink sm:text-3xl md:text-4xl">
+            Loan Interest Rates &amp; <span className="text-brand">Charges</span>
           </h2>
-          <p className="mx-auto mt-4 max-w-md text-sm text-muted">
-            Every fee and policy laid out transparently — because at Utkarsh
-            Capital, we believe clarity is the first step to trust.
+          <p className="mx-auto mt-4 max-w-md text-sm text-muted sm:text-base">
+            Every fee and policy laid out transparently — because at{" "}
+            <span className="font-semibold text-ink">Utkarsh Capital</span>,
+            we believe clarity is the first step to trust.
           </p>
         </div>
 
-        <div className="relative mt-14 pl-10">
-          <span className="absolute left-[15px] top-2 h-[calc(100%-1rem)] w-px bg-[#E4E0D6]" />
-          <div className="flex flex-col gap-8">
-            {CHARGES.map((c, i) => (
-              <div key={c.title} className="relative">
-                <span className="absolute -left-10 top-0.5 flex h-8 w-8 items-center justify-center rounded-full border border-gold/40 bg-white font-serif text-xs text-[#8A6A1F]">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <h3 className="font-serif text-base text-ink">{c.title}</h3>
-                <p className="mt-1.5 text-sm leading-relaxed text-muted">
-                  {c.desc}
-                </p>
-              </div>
-            ))}
-          </div>
+        <div className="mt-12 flex flex-col gap-4 sm:mt-14">
+          {CHARGES.map((c, i) => (
+            <div
+              key={c.title}
+              className="relative rounded-2xl border border-black/5 bg-white py-4 pl-14 pr-5 shadow-sm shadow-black/[0.02] sm:py-5 sm:pl-16 sm:pr-6"
+            >
+              <span className="absolute left-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-brand text-xs font-bold text-white sm:left-5 sm:top-5">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <h3 className="text-sm font-bold text-ink sm:text-base">
+                {c.title}
+              </h3>
+              <p className="mt-1.5 text-sm leading-relaxed text-muted">
+                {c.desc}
+              </p>
+            </div>
+          ))}
         </div>
 
-        <p className="mt-14 rounded-xl bg-brand/5 px-6 py-4 text-center text-xs text-muted">
+        <p className="mt-10 rounded-2xl bg-brand-light px-6 py-4 text-center text-xs text-brand sm:text-sm">
           Rates &amp; charges are indicative and depend on credit profile and
           lender approval.
         </p>
@@ -748,19 +779,20 @@ export default function Home() {
       {/* ---------------------------------------------------------- */}
       {/* FAQ                                                         */}
       {/* ---------------------------------------------------------- */}
-      <section id="faq" className="border-y border-[#E4E0D6] bg-white py-24">
-        <div className="mx-auto max-w-3xl px-6">
+      <section id="faq" className="bg-[#FAFAFE] py-16 sm:py-24">
+        <div className="mx-auto max-w-3xl px-4 sm:px-6">
           <div className="text-center">
-            <h2 className="font-serif text-3xl text-ink md:text-4xl">
-              Frequently asked questions
+            <h2 className="text-2xl font-extrabold text-ink sm:text-3xl md:text-4xl">
+              Frequently Asked Questions
             </h2>
-            <p className="mt-4 text-sm text-muted">
-              Get quick answers to the most common queries about Utkarsh
-              Capital loans.
+            <p className="mt-4 text-sm text-muted sm:text-base">
+              Get quick answers to the most common queries about{" "}
+              <span className="font-semibold text-brand">Utkarsh Capital</span>{" "}
+              loans.
             </p>
           </div>
 
-          <div className="mt-12 border-t border-[#E4E0D6]">
+          <div className="mt-10 flex flex-col gap-3 sm:mt-12">
             {FAQS.map((item, i) => (
               <FaqItem
                 key={item.q}
@@ -774,7 +806,7 @@ export default function Home() {
 
           <p className="mt-8 text-center text-sm text-muted">
             Can&apos;t find your answer?{" "}
-            <a href="#contact" className="font-medium text-brand underline underline-offset-2">
+            <a href="#contact" className="font-semibold text-brand underline underline-offset-2">
               Contact support
             </a>{" "}
             — we&apos;re here to help.
@@ -785,35 +817,43 @@ export default function Home() {
       {/* ---------------------------------------------------------- */}
       {/* Grievance redressal                                         */}
       {/* ---------------------------------------------------------- */}
-      <section className="mx-auto max-w-7xl px-6 py-24">
-        <div className="grid gap-12 rounded-2xl border border-[#E4E0D6] bg-white p-8 md:grid-cols-2 md:items-center md:p-12">
+      <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 sm:py-24">
+        <div className="grid gap-8 rounded-3xl bg-brand-light p-6 md:grid-cols-2 md:items-center md:gap-12 md:p-12">
           <div>
-            <h2 className="font-serif text-2xl text-ink md:text-3xl">
-              Grievance redressal
+            <h2 className="text-xl font-extrabold text-ink sm:text-2xl md:text-3xl">
+              Grievance Redressal
             </h2>
-            <p className="mt-5 text-sm leading-relaxed text-muted">
-              At Utkarsh Capital, we strictly adhere to RBI directives and
-              have established a robust Grievance Redressal Cell to address
-              all concerns promptly. We are committed to responsible lending,
-              ensuring that our loan offerings are convenient to repay. Our
-              recovery methods are ethical, and we never resort to coercive
-              tactics; if you have any complaints, we take them seriously and
-              strive to resolve all issues within 5 working days.
+            <p className="mt-5 text-sm leading-relaxed text-muted sm:text-base">
+              At <span className="font-semibold text-ink">Utkarsh Capital</span>,
+              we strictly adhere to RBI directives and have established a
+              robust Grievance Redressal Cell to address all concerns
+              promptly. We are committed to responsible lending, ensuring
+              that our loan offerings are convenient to repay. Our recovery
+              methods are ethical, and we never resort to coercive tactics;
+              if you have any complaints, we take them seriously and strive
+              to resolve all issues within 5 working days.
             </p>
-            <p className="mt-4 text-xs text-muted">
+            <p className="mt-4 text-xs text-muted sm:text-sm">
               We are proudly registered as{" "}
-              <span className="font-medium text-ink">
+              <span className="font-semibold text-ink">
                 Uni-Corn Fincorp Private Limited
               </span>
               , a Non-Banking Financial Company (NBFC) recognized and
               approved by the Reserve Bank of India (RBI).
             </p>
-            <p className="mt-3 inline-block rounded-md bg-gold/10 px-3 py-1.5 text-[11px] text-[#8A6A1F]">
-              Our Corporate Identity Number (CIN): U65923GJ2018PTC104572
+            <p className="mt-3 inline-block rounded-full bg-white px-4 py-2 text-[11px] font-medium text-brand shadow-sm">
+              CIN: U65923GJ2018PTC104572
             </p>
           </div>
-          <div className="flex aspect-[4/3] items-center justify-center rounded-xl bg-cream">
-            <Handshake className="h-24 w-24 text-brand/25" strokeWidth={1} />
+          <div className="flex aspect-[4/3] items-center justify-center rounded-2xl bg-white">
+            <div className="flex flex-col items-center gap-3">
+              <span className="flex h-20 w-20 items-center justify-center rounded-full bg-brand-light">
+                <Handshake className="h-10 w-10 text-brand" strokeWidth={1.5} />
+              </span>
+              <p className="text-sm font-semibold text-ink">
+                We&apos;re here to help
+              </p>
+            </div>
           </div>
         </div>
       </section>
@@ -821,25 +861,25 @@ export default function Home() {
       {/* ---------------------------------------------------------- */}
       {/* Footer                                                      */}
       {/* ---------------------------------------------------------- */}
-      <footer id="contact" className="bg-ink pt-20 text-white/70">
-        <div className="mx-auto grid max-w-7xl gap-12 px-6 pb-16 md:grid-cols-[1.3fr_1fr_1fr_1.3fr]">
+      <footer id="contact" className="bg-navy pb-24 pt-16 text-white/70 sm:pb-16">
+        <div className="mx-auto grid max-w-7xl gap-10 px-4 pb-14 sm:px-6 md:grid-cols-[1.3fr_1fr_1fr_1.3fr]">
           <div>
             <a href="#home" className="flex items-center gap-2">
-              <span className="flex h-9 w-9 items-center justify-center rounded-full bg-gold font-serif text-base text-ink">
+              <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand font-extrabold text-white">
                 U
               </span>
-              <span className="font-serif text-lg text-white">Utkarsh Capital</span>
+              <span className="text-lg font-bold text-white">Utkarsh Capital</span>
             </a>
             <p className="mt-4 max-w-xs text-sm leading-relaxed">
               Fair, reliable loans from ₹50,000 to ₹50 lakh, tailored to your
               needs and business financial journey.
             </p>
-            <div className="mt-6 flex gap-4">
+            <div className="mt-6 flex gap-3">
               {[Facebook, Instagram, Linkedin, Twitter].map((Icon, i) => (
                 <a
                   key={i}
                   href="#"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border border-white/15 transition-colors hover:border-gold hover:text-gold"
+                  className="flex h-9 w-9 items-center justify-center rounded-full bg-white/10 transition-colors hover:bg-brand"
                 >
                   <Icon className="h-4 w-4" />
                 </a>
@@ -848,7 +888,7 @@ export default function Home() {
           </div>
 
           <div>
-            <h4 className="font-serif text-sm text-white">Quick Links</h4>
+            <h4 className="text-sm font-bold text-white">Quick Links</h4>
             <ul className="mt-4 flex flex-col gap-3 text-sm">
               {["Home", "About", "FAQ", "Contact", "Apply Now"].map((l) => (
                 <li key={l}>
@@ -861,7 +901,7 @@ export default function Home() {
           </div>
 
           <div>
-            <h4 className="font-serif text-sm text-white">Legal</h4>
+            <h4 className="text-sm font-bold text-white">Legal</h4>
             <ul className="mt-4 flex flex-col gap-3 text-sm">
               {["Refund Policy", "Terms & Conditions", "Privacy Policy"].map(
                 (l) => (
@@ -876,13 +916,13 @@ export default function Home() {
           </div>
 
           <div>
-            <h4 className="font-serif text-sm text-white">Contact Us</h4>
+            <h4 className="text-sm font-bold text-white">Contact Us</h4>
             <ul className="mt-4 flex flex-col gap-3 text-sm">
               <li className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-gold" /> info@utkarshcapital.com
+                <Mail className="h-4 w-4 text-brand-light" /> info@utkarshcapital.com
               </li>
               <li className="flex items-start gap-2">
-                <MapPin className="h-4 w-4 shrink-0 text-gold" />
+                <MapPin className="h-4 w-4 shrink-0 text-brand-light" />
                 4th street, Colva, Goa, 403708
               </li>
             </ul>
@@ -895,6 +935,18 @@ export default function Home() {
           </p>
         </div>
       </footer>
+
+      {/* ---------------------------------------------------------- */}
+      {/* Mobile sticky CTA                                           */}
+      {/* ---------------------------------------------------------- */}
+      <div className="fixed inset-x-0 bottom-0 z-50 border-t border-black/5 bg-white/95 p-3 backdrop-blur sm:hidden">
+        <a
+          href="#home"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-brand py-3 text-sm font-semibold text-white"
+        >
+          Apply Now <ArrowRight className="h-4 w-4" />
+        </a>
+      </div>
     </main>
   );
 }
